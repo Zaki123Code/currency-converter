@@ -6,14 +6,14 @@ const fromCurr = document.querySelector(".from select");
 const toCurr = document.querySelector(".to select");
 const msg = document.querySelector(".msg");
 
-// Populate dropdowns with currency codes
+
 for (let select of dropdowns) {
   for (let currCode in countryList) {
     let newOption = document.createElement("option");
     newOption.innerText = currCode;
     newOption.value = currCode;
 
-    // Set default values
+   
     if (select.name === "from" && currCode === "USD") {
       newOption.selected = "selected";
     } else if (select.name === "to" && currCode === "PKR") {
@@ -22,22 +22,28 @@ for (let select of dropdowns) {
     select.append(newOption);
   }
 
-  // Update flag on currency change
   select.addEventListener("change", (evt) => {
     updateFlag(evt.target);
   });
 }
 
-// Fetch and update exchange rate
+const convertBtn = document.querySelector('#convert-btn');
 const updateExchangeRate = async () => {
-  let amount = document.querySelector(".amount input");
+  let amount = document.querySelector(".amount");
+  let errorMsg = document.querySelector(".errormsg");
   let amtVal = amount.value;
-  if (amtVal === "" || amtVal < 1) {
-    amtVal = 1;
-    amount.value = "1";
+
+  
+  if (amtVal <= 0) {
+    errorMsg.innerText = "Please enter a value greater than 0.";
+    errorMsg.style.visibility = "visible"; 
+    errorMsg.style.color="red";
+    return; 
   }
 
-  const URL = `${BASE_URL}/${fromCurr.value}`; // Correct URL
+  errorMsg.style.visibility = "hidden"; 
+
+  const URL = `${BASE_URL}/${fromCurr.value}`;   
 
   try {
     let response = await fetch(URL);
@@ -48,13 +54,13 @@ const updateExchangeRate = async () => {
 
     let data = await response.json();
     console.log(data);
-    let rate = data.rates[toCurr.value]; // Correct way to access rates
+    let rate = data.rates[toCurr.value]; 
 
     if (!rate) {
       throw new Error("Invalid target currency or rate not found");
     }
 
-    let finalAmount = (amtVal * rate).toFixed(2); // Round to 2 decimal places
+    let finalAmount = (amtVal * rate).toFixed(2); 
     msg.innerText = `${amtVal} ${fromCurr.value} = ${finalAmount} ${toCurr.value}`;
   } catch (error) {
     console.error(error.message);
@@ -62,7 +68,7 @@ const updateExchangeRate = async () => {
   }
 };
 
-// Update country flag
+
 const updateFlag = (element) => {
   let currCode = element.value;
   let countryCode = countryList[currCode];
@@ -73,7 +79,7 @@ const updateFlag = (element) => {
   }
 };
 
-// Event listeners
+
 btn.addEventListener("click", (evt) => {
   evt.preventDefault();
   updateExchangeRate();
