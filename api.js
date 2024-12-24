@@ -31,6 +31,7 @@ const convertBtn = document.querySelector('#convert-btn');
 const updateExchangeRate = async () => {
   let amount = document.querySelector(".amount");
   let errorMsg = document.querySelector(".errormsg");
+  amount.value = amount.value || 5;
   let amtVal = amount.value;
 
   
